@@ -1,2 +1,2 @@
 httpx
-httpx[h2]
+httpx[http2]
