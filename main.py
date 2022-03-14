@@ -1,6 +1,7 @@
 import os, httpx, random, time
 from random import randint
 from threading import Thread
+import asyncio
 
 webhook = input("Webhook: ")
 message = input("Message: ")
@@ -10,9 +11,8 @@ prox1 = list(map(lambda x:x.strip(),open(proxfile1)))
 Hosts = ['discord.gg','discord.com','discordapp.com']
 Uas = ['Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)','Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)','Mozilla/5.0 (compatible; Bingbot/2.0; +http://www.bing.com/bingbot.htm)','Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)','DuckDuckBot/1.0; (+http://duckduckgo.com/duckduckbot.html)']
 
-def webhookspam():
+def main():
     proxy1 = random.choice(prox1)
-    bypassint = randint(0, 1000)
     headers = {'Host': random.choice(Hosts),'User-Agent': random.choice(Uas)}
     with httpx.Client(http2=True,proxies='http://'+proxy1) as client:
         try:
@@ -20,24 +20,22 @@ def webhookspam():
                 while True:
                     response = client.post(
                         webhook,
-                        json = {"content" : str(bypassint)+' '+message+' '+str(bypassint)},
+                        json = {"content" : message},
                         params = {'wait' : True}
                     )
                     if response.status_code == 204 or response.status_code == 200:
-                        print("Message sent")
-                        time.sleep(20)
+                        print("message sent",response.status_code)
+                        time.sleep(1)
                     elif response.status_code == 429:
-                        print("Rate limited")
-                        time.sleep(1000)
+                        print("rate limited",response.status_code)
+                        time.sleep(5)
                     else:
-                        pass
+                        print('blocked',response.status_code)
             except httpx.HTTPError as exc:
-                pass
+                print('bad proxy')
         except:
             pass
-    
 if __name__ == "__main__":
     os.system('cls' if os.name == 'nt' else 'clear')
-    while True:
-        t = Thread(target=webhookspam,daemon=True).start()
-
+    for i in range(15):
+        thread = Thread(target=main).start()
